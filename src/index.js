@@ -4,8 +4,7 @@ import { AuthError, GeminiError } from './core/exceptions.js';
 import { ConversationMetadata } from './core/models.js';
 import { checkCookies, importCookiesFromRaw, clearCookiesFile, getFlatCookies } from './core/cookieManager.js';
 import { uploadToContentPush, buildFileDataItem } from './core/upload.js';
-import { logger } from '../../@exocore/multi/dist/index.js';
-
+import { logger } from "@exocore/multi";
 export {
   GeminiClient,
   AuthError,
