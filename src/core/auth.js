@@ -6,7 +6,7 @@ import {
 } from './constants.js';
 import { AuthError } from './exceptions.js';
 import { CookieJar } from '../util/cookieJar.js';
-import { logger } from '../../../@exocore/multi/dist/index.js';
+import { logger } from "@exocore/multi"
 
 export class AuthTokens {
   constructor(snlm0e = '', cfb2h = '', fdrfje = '') {
