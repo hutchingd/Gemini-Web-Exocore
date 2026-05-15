@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { logger } from '../../../@exocore/multi/dist/index.js';
+import { logger } from "@exocore/multi";
 
 const UPLOAD_ENDPOINT = 'https://push.clients6.google.com/upload/';
 const PUSH_ID         = 'feeds/mcudyrk2a4khkz';
