@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Exocore Gemini API</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#f5f5f7;
+  --surface:#ffffff;
+  --surface2:#f9f9fb;
+  --border:#e5e5ea;
+  --border2:#d1d1d6;
+  --text:#1c1c1e;
+  --text2:#3a3a3c;
+  --muted:#8e8e93;
+  --blue:#007aff;
+  --blue-bg:#f0f6ff;
+  --green:#34c759;
+  --green-bg:#f0faf3;
+  --orange:#ff9f0a;
+  --orange-bg:#fff8ec;
+  --red:#ff3b30;
+  --red-bg:#fff3f2;
+  --purple:#af52de;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.04);
+  --shadow-lg:0 4px 24px rgba(0,0,0,.10),0 1px 4px rgba(0,0,0,.06);
+  --radius:14px;
+  --radius-sm:10px;
+  --radius-xs:7px;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── Layout ── */
+.layout{display:flex;min-height:100vh}
+
+/* ── Sidebar ── */
+aside{
+  width:240px;min-width:240px;
+  background:rgba(255,255,255,.85);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-right:1px solid var(--border);
+  position:sticky;top:0;height:100vh;
+  overflow-y:auto;padding:20px 0 24px;
+  display:flex;flex-direction:column;
+}
+
+.logo-wrap{padding:0 16px 18px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{
+  width:36px;height:36px;
+  background:linear-gradient(145deg,#007aff,#5856d6);
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+  box-shadow:0 2px 8px rgba(0,122,255,.3);
+}
+.logo-title{font-size:15px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.logo-sub{font-size:11px;color:var(--muted)}
+
+.nav-group{padding:0 8px;margin-bottom:8px}
+.nav-label{
+  font-size:10px;font-weight:600;color:var(--muted);
+  letter-spacing:.5px;text-transform:uppercase;
+  padding:0 8px 6px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 10px;border-radius:8px;
+  text-decoration:none;font-size:13px;font-weight:500;
+  color:var(--text2);transition:all .15s;
+  margin-bottom:1px;
+}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{background:var(--blue-bg);color:var(--blue)}
+.nav-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.dot-get{background:var(--green)}
+.dot-post{background:var(--orange)}
+.dot-del{background:var(--red)}
+.dot-info{background:var(--blue)}
+
+.aside-footer{
+  margin:auto 16px 0;
+  padding:10px 12px;
+  background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--radius-xs);font-size:11px;color:var(--muted);
+}
+.aside-footer strong{color:var(--blue)}
+
+/* ── Main ── */
+main{flex:1;overflow-x:hidden}
+
+/* ── Hero ── */
+.hero{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:40px 48px 36px;
+}
+.hero-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--blue-bg);color:var(--blue);
+  font-size:11px;font-weight:600;letter-spacing:.3px;
+  padding:4px 10px;border-radius:20px;margin-bottom:16px;
+  border:1px solid rgba(0,122,255,.15);
+}
+.hero-chip::before{content:'';width:6px;height:6px;background:var(--blue);border-radius:50%}
+h1{
+  font-size:32px;font-weight:700;letter-spacing:-.8px;
+  color:var(--text);margin-bottom:10px;line-height:1.2;
+}
+.hero-desc{font-size:15px;color:var(--muted);max-width:560px;line-height:1.6;margin-bottom:24px}
+
+.base-url-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.base-box{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:9px 14px;
+}
+.base-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.base-url{font-family:'SF Mono',ui-monospace,monospace;font-size:13px;color:var(--blue);font-weight:500}
+.copy-btn{
+  background:white;border:1px solid var(--border);
+  color:var(--muted);border-radius:6px;padding:4px 10px;
+  font-size:11px;font-weight:500;cursor:pointer;
+  transition:all .15s;font-family:inherit;
+}
+.copy-btn:hover{color:var(--text);border-color:var(--border2)}
+.copy-btn.copied{color:var(--green);border-color:var(--green)}
+
+/* ── Content ── */
+.content{padding:36px 48px 80px}
+
+/* ── Section ── */
+.section{margin-bottom:48px}
+.section-eyebrow{
+  font-size:11px;font-weight:600;color:var(--blue);
+  letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;
+}
+h2{font-size:22px;font-weight:700;letter-spacing:-.4px;color:var(--text);margin-bottom:6px}
+.section-desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px}
+
+/* ── Steps ── */
+.steps{display:flex;flex-direction:column;gap:14px}
+.step{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:16px;
+}
+.step-num{
+  width:26px;height:26px;min-width:26px;
+  background:var(--blue);color:white;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;margin-top:1px;
+}
+.step-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
+.step-text{font-size:13px;color:var(--muted);line-height:1.6}
+.step-text code{
+  font-family:'SF Mono',ui-monospace,monospace;
+  font-size:11.5px;color:var(--blue);
+  background:var(--blue-bg);padding:1px 5px;border-radius:4px;
+}
+
+/* ── Alert ── */
+.alert{
+  display:flex;gap:10px;padding:12px 14px;
+  border-radius:var(--radius-xs);margin-bottom:14px;font-size:13px;
+}
+.alert.info{background:var(--blue-bg);border:1px solid rgba(0,122,255,.15)}
+.alert.warn{background:var(--orange-bg);border:1px solid rgba(255,159,10,.2)}
+.alert-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.alert.info .alert-icon{color:var(--blue)}
+.alert.warn .alert-icon{color:var(--orange)}
+.alert-text{color:var(--text2);line-height:1.6}
+.alert-text strong{color:var(--text)}
+.alert-text code{
+  font-family:'SF Mono',ui-monospace,monospace;
+  font-size:11.5px;background:rgba(0,0,0,.06);padding:1px 5px;border-radius:4px;
+}
+
+/* ── Endpoint card ── */
+.endpoint{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius);margin-bottom:16px;
+  box-shadow:var(--shadow);overflow:hidden;
+  transition:box-shadow .2s;
+}
+.endpoint:hover{box-shadow:var(--shadow-lg)}
+
+.ep-header{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 20px;cursor:pointer;user-select:none;
+  transition:background .1s;
+}
+.ep-header:hover{background:var(--surface2)}
+
+.method-badge{
+  font-family:'SF Mono',ui-monospace,monospace;
+  font-size:10.5px;font-weight:700;
+  padding:3px 9px;border-radius:5px;min-width:60px;text-align:center;
+  letter-spacing:.3px;
+}
+.GET   {background:var(--green-bg);color:#1a8a3a;border:1px solid rgba(52,199,89,.2)}
+.POST  {background:var(--orange-bg);color:#a0620a;border:1px solid rgba(255,159,10,.2)}
+.DELETE{background:var(--red-bg);color:#c0251c;border:1px solid rgba(255,59,48,.2)}
+
+.ep-path{
+  font-family:'SF Mono',ui-monospace,monospace;
+  font-size:13.5px;color:var(--text);font-weight:500;flex:1;
+}
+.ep-path .q{color:var(--muted)}
+.ep-summary{font-size:12.5px;color:var(--muted);margin-right:8px}
+.ep-chevron{
+  color:var(--muted);font-size:11px;
+  transition:transform .2s;flex-shrink:0;
+}
+.endpoint.open .ep-chevron{transform:rotate(90deg)}
+
+/* ── Ep body ── */
+.ep-body{display:none;border-top:1px solid var(--border)}
+.endpoint.open .ep-body{display:block}
+
+.ep-tabs{
+  display:flex;gap:0;border-bottom:1px solid var(--border);
+  background:var(--surface2);padding:0 20px;
+}
+.ep-tab{
+  padding:10px 14px;font-size:12.5px;font-weight:500;
+  color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;
+  transition:all .15s;white-space:nowrap;
+}
+.ep-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+.ep-tab:hover:not(.active){color:var(--text)}
+
+.tab-pane{display:none;padding:20px}
+.tab-pane.active{display:block}
+
+/* ── Params table ── */
+.params-table{width:100%;border-collapse:collapse;font-size:13px;border-radius:var(--radius-xs);overflow:hidden;border:1px solid var(--border)}
+.params-table th{
+  text-align:left;padding:8px 12px;
+  font-size:10.5px;font-weight:600;color:var(--muted);
+  letter-spacing:.4px;text-transform:uppercase;
+  background:var(--surface2);border-bottom:1px solid var(--border);
+}
+.params-table td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+.params-table tr:last-child td{border-bottom:none}
+.pname{font-family:'SF Mono',ui-monospace,monospace;color:var(--blue);font-size:12px}
+.ptype{font-family:'SF Mono',ui-monospace,monospace;color:var(--purple);font-size:11px}
+.req-badge{
+  display:inline-block;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:600;
+}
+.req{background:var(--red-bg);color:var(--red)}
+.opt{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+.pdesc{color:var(--muted);line-height:1.5;font-size:12.5px}
+.pdesc code{
+  font-family:'SF Mono',ui-monospace,monospace;font-size:11px;
+  background:var(--bg);padding:1px 4px;border-radius:3px;
+}
+
+/* ── Code block ── */
+.code-block{
+  background:#1c1c1e;border-radius:var(--radius-xs);
+  overflow:hidden;border:1px solid rgba(255,255,255,.06);
+  margin-bottom:12px;
+}
+.code-block:last-child{margin-bottom:0}
+.code-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:8px 14px;background:rgba(255,255,255,.04);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.code-lang{font-size:10px;color:#8e8e93;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.code-copy-btn{
+  font-size:10px;color:#8e8e93;
+  background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
+  border-radius:5px;padding:2px 8px;cursor:pointer;transition:all .15s;
+  font-family:inherit;
+}
+.code-copy-btn:hover{color:#fff}
+.code-copy-btn.copied{color:#34c759}
+pre{
+  padding:14px 16px;overflow-x:auto;
+  font-family:'SF Mono',ui-monospace,monospace;
+  font-size:12.5px;line-height:1.7;color:#e5e5ea;
+  white-space:pre;
+}
+.kw{color:#ff7eb6}
+.str{color:#94e2d5}
+.num{color:#f38ba8}
+.key{color:#89b4fa}
+.cmt{color:#6c7086;font-style:italic}
+.fn{color:#89dceb}
+.url{color:#89dceb}
+.val{color:#a6e3a1}
+.pu{color:#cba6f7}
+
+/* ── Response grid ── */
+.resp-list{display:flex;flex-direction:column;gap:8px}
+.resp-item{
+  display:flex;align-items:flex-start;gap:10px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:var(--radius-xs);padding:10px 12px;
+}
+.resp-code{
+  font-family:'SF Mono',ui-monospace,monospace;
+  font-size:11.5px;font-weight:700;white-space:nowrap;
+  padding:2px 7px;border-radius:4px;
+}
+.s2xx{background:var(--green-bg);color:#1a8a3a}
+.s4xx{background:var(--orange-bg);color:#a0620a}
+.s5xx{background:var(--red-bg);color:var(--red)}
+.resp-desc{font-size:12.5px;color:var(--muted);line-height:1.5}
+.resp-desc code{font-family:'SF Mono',ui-monospace,monospace;font-size:11px;background:var(--bg);padding:1px 4px;border-radius:3px}
+
+/* ── TRY IT ── */
+.try-panel{padding:20px;background:var(--surface2);border-top:1px solid var(--border) /* only if standalone */}
+.try-fields{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.try-field{display:flex;flex-direction:column;gap:4px}
+.try-label{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:.3px;text-transform:uppercase}
+.try-input{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-xs);padding:9px 12px;
+  font-size:13px;font-family:inherit;color:var(--text);
+  transition:border-color .15s;outline:none;width:100%;
+}
+.try-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,122,255,.1)}
+textarea.try-input{min-height:80px;resize:vertical;font-family:'SF Mono',ui-monospace,monospace;font-size:12px}
+
+.run-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--blue);color:white;
+  border:none;border-radius:var(--radius-xs);
+  padding:9px 18px;font-size:13px;font-weight:600;
+  cursor:pointer;transition:all .15s;font-family:inherit;
+}
+.run-btn:hover{background:#0066dd;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,122,255,.3)}
+.run-btn:active{transform:translateY(0);box-shadow:none}
+.run-btn:disabled{background:var(--border2);cursor:not-allowed;transform:none;box-shadow:none}
+.run-btn .spin{animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.result-box{margin-top:14px}
+.result-header{
+  display:flex;align-items:center;gap:10px;margin-bottom:8px;
+  font-size:11.5px;font-weight:600;color:var(--muted);
+}
+.status-pill{
+  padding:2px 8px;border-radius:4px;
+  font-family:'SF Mono',ui-monospace,monospace;font-size:11px;font-weight:700;
+}
+.status-ok{background:var(--green-bg);color:#1a8a3a}
+.status-err{background:var(--red-bg);color:var(--red)}
+.status-warn{background:var(--orange-bg);color:#a0620a}
+.result-pre{
+  background:#1c1c1e;border-radius:var(--radius-xs);
+  padding:14px 16px;overflow-x:auto;
+  font-family:'SF Mono',ui-monospace,monospace;
+  font-size:12.5px;line-height:1.7;color:#e5e5ea;
+  white-space:pre-wrap;word-break:break-all;
+  border:1px solid rgba(255,255,255,.06);
+  max-height:320px;overflow-y:auto;
+}
+.result-msg-bubble{
+  background:white;border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:14px 16px;
+  font-size:14px;color:var(--text);line-height:1.7;
+  box-shadow:var(--shadow);
+}
+.result-meta{
+  display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;
+}
+.meta-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:5px;padding:3px 8px;font-size:11px;
+}
+.meta-chip .k{color:var(--muted)}
+.meta-chip .v{font-family:'SF Mono',ui-monospace,monospace;color:var(--blue);font-size:10.5px}
+
+/* ── Footer ── */
+footer{
+  border-top:1px solid var(--border);background:var(--surface);
+  padding:16px 48px;display:flex;align-items:center;justify-content:space-between;
+  font-size:12px;color:var(--muted);
+}
+footer a{color:var(--blue);text-decoration:none}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ── Mobile ── */
+@media(max-width:800px){
+  aside{display:none}
+  .hero,.content{padding-left:16px;padding-right:16px}
+  .hero{padding-top:24px;padding-bottom:24px}
+  .content{padding-top:20px;padding-bottom:48px}
+  h1{font-size:22px;letter-spacing:-.5px}
+  .hero-desc{font-size:13px}
+  .ep-summary{display:none}
+  .ep-path{font-size:12px}
+  footer{flex-direction:column;gap:6px;padding:16px;text-align:center}
+  /* tables scroll horizontally on mobile */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:var(--radius-xs);border:1px solid var(--border)}
+  .table-wrap .params-table{border:none;border-radius:0;min-width:480px}
+  /* code blocks don't overflow */
+  pre{font-size:11.5px}
+  .code-block{border-radius:var(--radius-xs)}
+  /* try panel inputs full width */
+  .try-input{font-size:14px}
+  /* base url box wraps */
+  .base-url-row{flex-direction:column;align-items:flex-start;gap:8px}
+  .base-box{width:100%;justify-content:space-between}
+  .base-url{font-size:11px;word-break:break-all}
+  /* result bubble */
+  .result-msg-bubble{font-size:13px}
+  /* ep header stack on very small */
+  .ep-header{flex-wrap:wrap;gap:8px}
+  /* resp grid single col */
+  .resp-list{gap:6px}
+}
+</style>
+</head>
+<body>
+<script>
+  (function(){
+    var h = window.location.hostname;
+    var p = window.location.port;
+    var proto = window.location.protocol;
+    var isLocal = h === 'localhost' || h === '127.0.0.1' || h.endsWith('.local');
+    var base = proto + '//' + h + (p && !((proto==='https:'&&p==='443')||(proto==='http:'&&p==='80')) ? ':'+p : '');
+    document.addEventListener('DOMContentLoaded', function(){
+      var el = document.getElementById('baseUrl');
+      if(el) el.textContent = base;
+    });
+    window.__BASE = base;
+  })();
+</script>
+<div class="layout">
+
+<!-- ══ Sidebar ══ -->
+<aside>
+  <div class="logo-wrap">
+    <a class="logo" href="#">
+      <div class="logo-icon">⬡</div>
+      <div>
+        <div class="logo-title">Exocore</div>
+        <div class="logo-sub">Gemini API Docs</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="#quickstart"><span class="nav-dot dot-info"></span>Quick Start</a>
+    <a class="nav-item" href="#auth"><span class="nav-dot dot-info"></span>Authentication</a>
+  </div>
+
+  <div class="nav-group">
+    <div class="nav-label">Endpoints</div>
+    <a class="nav-item" href="#health"><span class="nav-dot dot-get"></span>Health Check</a>
+    <a class="nav-item" href="#get-cookies"><span class="nav-dot dot-get"></span>Get Cookies</a>
+    <a class="nav-item" href="#set-cookies"><span class="nav-dot dot-post"></span>Set Cookies</a>
+    <a class="nav-item" href="#clear-cookies"><span class="nav-dot dot-del"></span>Clear Cookies</a>
+    <a class="nav-item" href="#chat"><span class="nav-dot dot-get"></span>Chat</a>
+  </div>
+
+  <div class="aside-footer">v1.0.0 · gemini-web<br><strong>@exocore/multi</strong></div>
+</aside>
+
+<!-- ══ Main ══ -->
+<main>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-chip">REST API Reference</div>
+  <h1>Exocore Gemini API</h1>
+  <p class="hero-desc">Cookie-based proxy to Google Gemini — multi-turn chat, file uploads, and session management over a simple HTTP interface.</p>
+  <div class="base-url-row">
+    <div class="base-box">
+      <span class="base-label">Base URL</span>
+      <span class="base-url" id="baseUrl"></span>
+    </div>
+    <button class="copy-btn" id="copyBaseBtn" onclick="copyBase()">Copy</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- Quick Start -->
+<div class="section" id="quickstart">
+  <div class="section-eyebrow">Getting Started</div>
+  <h2>Quick Start</h2>
+  <p class="section-desc">Three steps to your first Gemini reply.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Check the server</div>
+        <div class="step-text">Call <code>GET /api/gemini/health</code> — you should see <code>client_ready: true</code>.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Paste fresh cookies</div>
+        <div class="step-text">Copy your Gemini session cookies from DevTools → Application → Cookies, then send them to <code>POST /api/gemini/cookies</code>.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Send a message</div>
+        <div class="step-text">Call <code>GET /api/gemini/chat?ask=Hello</code>. Save the <code>cid</code> + <code>rid</code> from the response for multi-turn chat.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Auth -->
+<div class="section" id="auth">
+  <div class="section-eyebrow">Authentication</div>
+  <h2>Cookie-Based Auth</h2>
+  <p class="section-desc">No API key needed. The server authenticates to Google using browser cookies you provide.</p>
+  <div class="alert warn">
+    <div class="alert-icon">⚠️</div>
+    <div class="alert-text"><strong>Cookies expire.</strong> If you get a <code>401</code>, re-paste fresh cookies via <code>POST /api/gemini/cookies</code>.</div>
+  </div>
+  <div class="alert info">
+    <div class="alert-icon">ℹ️</div>
+    <div class="alert-text"><strong>How to copy cookies:</strong> Open gemini.google.com → DevTools (F12) → Application → Cookies → select all, or use a browser extension like Cookie Editor to export as "Header String".</div>
+  </div>
+</div>
+
+<!-- ══ ENDPOINTS ══ -->
+<div class="section">
+  <div class="section-eyebrow">Endpoints</div>
+  <h2>API Reference</h2>
+  <p class="section-desc">All endpoints are prefixed with <code style="font-family:'SF Mono',monospace;color:var(--blue);font-size:12.5px;background:var(--blue-bg);padding:2px 6px;border-radius:4px">/api/gemini</code>. Use the <strong>Try it</strong> tab to run requests live.</p>
+
+  <!-- ── HEALTH ── -->
+  <div class="endpoint open" id="health">
+    <div class="ep-header" onclick="toggleEp(this)">
+      <span class="method-badge GET">GET</span>
+      <span class="ep-path">/api/gemini/health</span>
+      <span class="ep-summary">Server &amp; client status</span>
+      <span class="ep-chevron">▶</span>
+    </div>
+    <div class="ep-body">
+      <div class="ep-tabs">
+        <div class="ep-tab active" onclick="switchTab(this,'docs')">Docs</div>
+        <div class="ep-tab" onclick="switchTab(this,'try')">▶ Try it</div>
+      </div>
+
+      <div class="tab-pane active" data-pane="docs">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">Returns the server health, Gemini client state, cookie validity, and active providers. Use this to confirm everything is working before sending chat requests.</p>
+        <div class="code-block">
+          <div class="code-top"><span class="code-lang">cURL</span><button class="code-copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="kw">curl</span> <span class="url">"http://localhost:3000/api/gemini/health"</span></pre>
+        </div>
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-top"><span class="code-lang">Response · 200 OK</span></div>
+          <pre>{
+  <span class="key">"ok"</span>: <span class="val">true</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"status"</span>:        <span class="str">"ok"</span>,
+    <span class="key">"client_ready"</span>:  <span class="val">true</span>,
+    <span class="key">"cookies_valid"</span>: <span class="val">true</span>,
+    <span class="key">"cookies_path"</span>:  <span class="str">"./exocoreCookies.json"</span>,
+    <span class="key">"jar_size"</span>:      <span class="num">27</span>,
+    <span class="key">"providers"</span>:     [<span class="str">"gemini"</span>]
+  }
+}</pre>
+        </div>
+      </div>
+
+      <div class="tab-pane try-panel" data-pane="try">
+        <button class="run-btn" onclick="runHealth(this)">▶ Run</button>
+        <div class="result-box" id="health-result" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── GET COOKIES ── -->
+  <div class="endpoint" id="get-cookies">
+    <div class="ep-header" onclick="toggleEp(this)">
+      <span class="method-badge GET">GET</span>
+      <span class="ep-path">/api/gemini/cookies</span>
+      <span class="ep-summary">Inspect loaded cookies</span>
+      <span class="ep-chevron">▶</span>
+    </div>
+    <div class="ep-body">
+      <div class="ep-tabs">
+        <div class="ep-tab active" onclick="switchTab(this,'docs')">Docs</div>
+        <div class="ep-tab" onclick="switchTab(this,'try')">▶ Try it</div>
+      </div>
+
+      <div class="tab-pane active" data-pane="docs">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">Returns metadata about the currently loaded cookie jar. Does not expose cookie values — only count, path, and validity.</p>
+        <div class="code-block">
+          <div class="code-top"><span class="code-lang">cURL</span><button class="code-copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="kw">curl</span> <span class="url">"http://localhost:3000/api/gemini/cookies"</span></pre>
+        </div>
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-top"><span class="code-lang">Response · 200 OK</span></div>
+          <pre>{
+  <span class="key">"ok"</span>: <span class="val">true</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"valid"</span>:    <span class="val">true</span>,
+    <span class="key">"path"</span>:     <span class="str">"./exocoreCookies.json"</span>,
+    <span class="key">"jar_size"</span>: <span class="num">27</span>
+  }
+}</pre>
+        </div>
+      </div>
+
+      <div class="tab-pane try-panel" data-pane="try">
+        <button class="run-btn" onclick="runGetCookies(this)">▶ Run</button>
+        <div class="result-box" id="get-cookies-result" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── POST COOKIES ── -->
+  <div class="endpoint" id="set-cookies">
+    <div class="ep-header" onclick="toggleEp(this)">
+      <span class="method-badge POST">POST</span>
+      <span class="ep-path">/api/gemini/cookies</span>
+      <span class="ep-summary">Upload fresh cookies</span>
+      <span class="ep-chevron">▶</span>
+    </div>
+    <div class="ep-body">
+      <div class="ep-tabs">
+        <div class="ep-tab active" onclick="switchTab(this,'docs')">Docs</div>
+        <div class="ep-tab" onclick="switchTab(this,'try')">▶ Try it</div>
+      </div>
+
+      <div class="tab-pane active" data-pane="docs">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">Replace the cookie jar with a fresh raw cookie string from your browser. The server parses, saves to disk, resets, and re-initializes the Gemini client automatically.</p>
+        <div class="table-wrap" style="margin-bottom:16px">
+        <table class="params-table">
+          <thead><tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="pname">body</span></td>
+              <td><span class="ptype">string</span></td>
+              <td><span class="req-badge req">Required</span></td>
+              <td class="pdesc">Raw cookie string <code>SID=x; HSID=y; ...</code> — plain text or JSON <code>{"raw":"..."}</code></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="code-block">
+          <div class="code-top"><span class="code-lang">cURL · plain text</span><button class="code-copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="kw">curl</span> -X POST <span class="url">"http://localhost:3000/api/gemini/cookies"</span> \
+  -H <span class="str">"Content-Type: text/plain"</span> \
+  --data-raw <span class="str">"SID=abc; HSID=xyz; SSID=foo; ..."</span></pre>
+        </div>
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-top"><span class="code-lang">Response · 200 OK</span></div>
+          <pre>{ <span class="key">"ok"</span>: <span class="val">true</span>, <span class="key">"data"</span>: { <span class="key">"ok"</span>: <span class="val">true</span>, <span class="key">"parsed"</span>: <span class="num">27</span> } }</pre>
+        </div>
+        <div style="margin-top:12px">
+          <div class="resp-list">
+            <div class="resp-item"><span class="resp-code s2xx">200</span><span class="resp-desc">Cookies parsed, saved, client reset.</span></div>
+            <div class="resp-item"><span class="resp-code s4xx">400</span><span class="resp-desc">Body empty or cookie string invalid.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-pane try-panel" data-pane="try">
+        <div class="try-fields">
+          <div class="try-field">
+            <label class="try-label">Raw Cookie String</label>
+            <textarea class="try-input" id="cookies-input" placeholder="SID=abc123; HSID=xyz; SSID=foo; __Secure-1PSID=bar; ..."></textarea>
+          </div>
+        </div>
+        <button class="run-btn" onclick="runSetCookies(this)">▶ Run</button>
+        <div class="result-box" id="set-cookies-result" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DELETE COOKIES ── -->
+  <div class="endpoint" id="clear-cookies">
+    <div class="ep-header" onclick="toggleEp(this)">
+      <span class="method-badge DELETE">DELETE</span>
+      <span class="ep-path">/api/gemini/cookies</span>
+      <span class="ep-summary">Clear all cookies</span>
+      <span class="ep-chevron">▶</span>
+    </div>
+    <div class="ep-body">
+      <div class="ep-tabs">
+        <div class="ep-tab active" onclick="switchTab(this,'docs')">Docs</div>
+        <div class="ep-tab" onclick="switchTab(this,'try')">▶ Try it</div>
+      </div>
+
+      <div class="tab-pane active" data-pane="docs">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">Deletes the cookie file from disk, resets the in-memory jar, and tears down the active client. The server becomes unauthenticated until new cookies are provided.</p>
+        <div class="code-block">
+          <div class="code-top"><span class="code-lang">cURL</span><button class="code-copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="kw">curl</span> -X DELETE <span class="url">"http://localhost:3000/api/gemini/cookies"</span></pre>
+        </div>
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-top"><span class="code-lang">Response · 200 OK</span></div>
+          <pre>{ <span class="key">"ok"</span>: <span class="val">true</span>, <span class="key">"data"</span>: { <span class="key">"cleared"</span>: <span class="val">true</span> } }</pre>
+        </div>
+      </div>
+
+      <div class="tab-pane try-panel" data-pane="try">
+        <div class="alert warn" style="margin-bottom:14px">
+          <div class="alert-icon">⚠️</div>
+          <div class="alert-text">This will <strong>delete all stored cookies</strong> and disconnect the client.</div>
+        </div>
+        <button class="run-btn" style="background:var(--red)" onclick="runDeleteCookies(this)">▶ Run — Clear Cookies</button>
+        <div class="result-box" id="clear-cookies-result" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CHAT ── -->
+  <div class="endpoint" id="chat">
+    <div class="ep-header" onclick="toggleEp(this)">
+      <span class="method-badge GET">GET</span>
+      <span class="ep-path">/api/gemini/chat<span class="q">?ask=&lt;message&gt;</span></span>
+      <span class="ep-summary">Send a message to Gemini</span>
+      <span class="ep-chevron">▶</span>
+    </div>
+    <div class="ep-body">
+      <div class="ep-tabs">
+        <div class="ep-tab active" onclick="switchTab(this,'docs')">Docs</div>
+        <div class="ep-tab" onclick="switchTab(this,'try')">▶ Try it</div>
+      </div>
+
+      <div class="tab-pane active" data-pane="docs">
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">Sends a text prompt (and optional file URLs) to Gemini and returns the reply. Supports multi-turn conversations — pass back the <code>cid</code>, <code>rid</code>, and <code>rcid</code> from a previous response to continue the conversation.</p>
+
+        <div class="table-wrap" style="margin-bottom:16px">
+        <table class="params-table">
+          <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="pname">ask</span></td>
+              <td><span class="ptype">string</span></td>
+              <td><span class="req-badge req">Required*</span></td>
+              <td class="pdesc">Text prompt. Alias: <code>chat</code>. At least one of <code>ask</code> or <code>upload</code> required.</td>
+            </tr>
+            <tr>
+              <td><span class="pname">upload</span></td>
+              <td><span class="ptype">string</span></td>
+              <td><span class="req-badge opt">Optional</span></td>
+              <td class="pdesc">Comma/space-separated file URLs to attach (images, PDFs, text).</td>
+            </tr>
+            <tr>
+              <td><span class="pname">cid</span></td>
+              <td><span class="ptype">string</span></td>
+              <td><span class="req-badge opt">Optional</span></td>
+              <td class="pdesc">Conversation ID from previous response — enables multi-turn.</td>
+            </tr>
+            <tr>
+              <td><span class="pname">rid</span></td>
+              <td><span class="ptype">string</span></td>
+              <td><span class="req-badge opt">Optional</span></td>
+              <td class="pdesc">Response ID from previous response.</td>
+            </tr>
+            <tr>
+              <td><span class="pname">rcid</span></td>
+              <td><span class="ptype">string</span></td>
+              <td><span class="req-badge opt">Optional</span></td>
+              <td class="pdesc">Response candidate ID from previous response.</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+
+        <div class="code-block">
+          <div class="code-top"><span class="code-lang">cURL · simple</span><button class="code-copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="kw">curl</span> <span class="str">"http://localhost:3000/api/gemini/chat?ask=What+is+the+capital+of+France"</span></pre>
+        </div>
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-top"><span class="code-lang">cURL · multi-turn</span><button class="code-copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="cmt"># First turn</span>
+<span class="kw">curl</span> <span class="str">"http://localhost:3000/api/gemini/chat?ask=Tell+me+a+joke"</span>
+
+<span class="cmt"># Continue the conversation with cid/rid from above</span>
+<span class="kw">curl</span> <span class="str">"http://localhost:3000/api/gemini/chat?ask=Explain+it&amp;cid=CID&amp;rid=RID&amp;rcid=RCID"</span></pre>
+        </div>
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-top"><span class="code-lang">JavaScript · fetch</span><button class="code-copy-btn" onclick="copyCode(this)">Copy</button></div>
+          <pre><span class="kw">const</span> res  = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="str">`/api/gemini/chat?ask=<span class="pu">${encodeURIComponent('Hello!')}</span>`</span>);
+<span class="kw">const</span> { msg, cid, rid, rcid } = <span class="kw">await</span> res.<span class="fn">json</span>();
+console.<span class="fn">log</span>(msg); <span class="cmt">// Gemini reply</span></pre>
+        </div>
+        <div class="code-block" style="margin-top:12px">
+          <div class="code-top"><span class="code-lang">Response · 200 OK</span></div>
+          <pre>{
+  <span class="key">"msg"</span>:  <span class="str">"Paris is the capital of France."</span>,
+  <span class="key">"cid"</span>:  <span class="str">"c_abc123"</span>,
+  <span class="key">"rid"</span>:  <span class="str">"r_xyz789"</span>,
+  <span class="key">"rcid"</span>: <span class="str">"rc_000"</span>
+}</pre>
+        </div>
+        <div style="margin-top:12px">
+          <div class="resp-list">
+            <div class="resp-item"><span class="resp-code s2xx">200</span><span class="resp-desc"><code>msg</code> = AI reply. Save <code>cid</code>/<code>rid</code>/<code>rcid</code> for follow-up turns.</span></div>
+            <div class="resp-item"><span class="resp-code s4xx">400</span><span class="resp-desc">No <code>ask</code> param and no valid <code>upload</code> URL.</span></div>
+            <div class="resp-item"><span class="resp-code s4xx">401</span><span class="resp-desc">Cookies missing or expired — re-authenticate.</span></div>
+            <div class="resp-item"><span class="resp-code s5xx">500/503</span><span class="resp-desc">Gemini client error or unexpected failure.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TRY IT: CHAT -->
+      <div class="tab-pane try-panel" data-pane="try">
+        <div class="try-fields">
+          <div class="try-field">
+            <label class="try-label">Message (ask)</label>
+            <input class="try-input" id="chat-ask" type="text" placeholder="What is the capital of France?" />
+          </div>
+          <div class="try-field">
+            <label class="try-label">File Upload URLs <span style="font-weight:400;color:var(--muted)">(optional, comma-separated)</span></label>
+            <input class="try-input" id="chat-upload" type="text" placeholder="https://example.com/image.jpg" />
+          </div>
+
+          <details style="margin-top:2px">
+            <summary style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;cursor:pointer;user-select:none;padding:4px 0">Multi-turn IDs (optional)</summary>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+              <div class="try-field">
+                <label class="try-label">cid</label>
+                <input class="try-input" id="chat-cid" type="text" placeholder="from previous response" />
+              </div>
+              <div class="try-field">
+                <label class="try-label">rid</label>
+                <input class="try-input" id="chat-rid" type="text" placeholder="from previous response" />
+              </div>
+              <div class="try-field">
+                <label class="try-label">rcid</label>
+                <input class="try-input" id="chat-rcid" type="text" placeholder="from previous response" />
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <button class="run-btn" onclick="runChat(this)">▶ Run</button>
+        <div class="result-box" id="chat-result" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /section -->
+</div><!-- /content -->
+
+<footer>
+  <span>Exocore Gemini API · v1.0.0</span>
+  <span>Built with <a href="#">@exocore/multi</a></span>
+</footer>
+</main>
+</div>
+
+<script>
+// ── Base URL ──
+const BASE = window.__BASE || window.location.origin;
+
+function copyBase() {
+  navigator.clipboard.writeText(BASE).then(() => {
+    const btn = document.getElementById('copyBaseBtn');
+    btn.textContent = 'Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1600);
+  });
+}
+
+// ── Rewrite localhost:3000 in code blocks to actual origin ──
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('pre').forEach(pre => {
+    pre.innerHTML = pre.innerHTML.replaceAll('http://localhost:3000', BASE);
+  });
+});
+
+// ── Toggle endpoint open/close ──
+function toggleEp(header) {
+  const card = header.closest('.endpoint');
+  card.classList.toggle('open');
+}
+
+// ── Switch tabs ──
+function switchTab(tab, pane) {
+  const body = tab.closest('.ep-body');
+  body.querySelectorAll('.ep-tab').forEach(t => t.classList.remove('active'));
+  body.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  tab.classList.add('active');
+  body.querySelector(`[data-pane="${pane}"]`).classList.add('active');
+}
+
+// ── Copy code block ──
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'Copied!'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1600);
+  });
+}
+
+// ── Render result ──
+function showResult(containerId, status, body, isChat) {
+  const box = document.getElementById(containerId);
+  box.style.display = 'block';
+  const ok = status >= 200 && status < 300;
+  const pillClass = ok ? 'status-ok' : status >= 500 ? 'status-err' : 'status-warn';
+
+  if (isChat && ok && body.msg) {
+    box.innerHTML = `
+      <div class="result-header">
+        <span class="status-pill ${pillClass}">${status}</span>
+        <span>Gemini Reply</span>
+      </div>
+      <div class="result-msg-bubble">${escHtml(body.msg)}</div>
+      ${body.cid ? `<div class="result-meta">
+        <div class="meta-chip"><span class="k">cid&nbsp;</span><span class="v">${escHtml(body.cid)}</span></div>
+        <div class="meta-chip"><span class="k">rid&nbsp;</span><span class="v">${escHtml(body.rid)}</span></div>
+        <div class="meta-chip"><span class="k">rcid</span><span class="v">${escHtml(body.rcid)}</span></div>
+      </div>
+      <div style="margin-top:8px;font-size:11.5px;color:var(--muted)">💡 Copy these IDs into the Multi-turn fields to continue the conversation.</div>` : ''}
+    `;
+    // Auto-fill multi-turn fields
+    if (body.cid) {
+      document.getElementById('chat-cid').value  = body.cid;
+      document.getElementById('chat-rid').value  = body.rid || '';
+      document.getElementById('chat-rcid').value = body.rcid || '';
+    }
+  } else {
+    box.innerHTML = `
+      <div class="result-header">
+        <span class="status-pill ${pillClass}">${status}</span>
+        <span>${ok ? 'Success' : 'Error'}</span>
+      </div>
+      <div class="result-pre">${escHtml(JSON.stringify(body, null, 2))}</div>
+    `;
+  }
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function setLoading(btn, loading) {
+  if (loading) {
+    btn.disabled = true;
+    btn.dataset.orig = btn.innerHTML;
+    btn.innerHTML = '<span class="spin">⟳</span> Running…';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = btn.dataset.orig || '▶ Run';
+  }
+}
+
+// ── HEALTH ──
+async function runHealth(btn) {
+  setLoading(btn, true);
+  try {
+    const r = await fetch(`${BASE}/api/gemini/health`);
+    showResult('health-result', r.status, await r.json(), false);
+  } catch(e) {
+    showResult('health-result', 0, {error: e.message}, false);
+  }
+  setLoading(btn, false);
+}
+
+// ── GET COOKIES ──
+async function runGetCookies(btn) {
+  setLoading(btn, true);
+  try {
+    const r = await fetch(`${BASE}/api/gemini/cookies`);
+    showResult('get-cookies-result', r.status, await r.json(), false);
+  } catch(e) {
+    showResult('get-cookies-result', 0, {error: e.message}, false);
+  }
+  setLoading(btn, false);
+}
+
+// ── SET COOKIES ──
+async function runSetCookies(btn) {
+  const raw = document.getElementById('cookies-input').value.trim();
+  if (!raw) { alert('Please paste your cookie string first.'); return; }
+  setLoading(btn, true);
+  try {
+    const r = await fetch(`${BASE}/api/gemini/cookies`, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain'},
+      body: raw
+    });
+    showResult('set-cookies-result', r.status, await r.json(), false);
+  } catch(e) {
+    showResult('set-cookies-result', 0, {error: e.message}, false);
+  }
+  setLoading(btn, false);
+}
+
+// ── DELETE COOKIES ──
+async function runDeleteCookies(btn) {
+  if (!confirm('Clear all cookies? The client will be disconnected.')) return;
+  setLoading(btn, true);
+  try {
+    const r = await fetch(`${BASE}/api/gemini/cookies`, {method:'DELETE'});
+    showResult('clear-cookies-result', r.status, await r.json(), false);
+  } catch(e) {
+    showResult('clear-cookies-result', 0, {error: e.message}, false);
+  }
+  setLoading(btn, false);
+}
+
+// ── CHAT ──
+async function runChat(btn) {
+  const ask  = document.getElementById('chat-ask').value.trim();
+  const upload = document.getElementById('chat-upload').value.trim();
+  const cid  = document.getElementById('chat-cid').value.trim();
+  const rid  = document.getElementById('chat-rid').value.trim();
+  const rcid = document.getElementById('chat-rcid').value.trim();
+
+  if (!ask && !upload) { alert('Enter a message or upload URL first.'); return; }
+
+  const params = new URLSearchParams();
+  if (ask)    params.set('ask', ask);
+  if (upload) params.set('upload', upload);
+  if (cid)    params.set('cid', cid);
+  if (rid)    params.set('rid', rid);
+  if (rcid)   params.set('rcid', rcid);
+
+  setLoading(btn, true);
+  try {
+    const r = await fetch(`${BASE}/api/gemini/chat?${params}`);
+    showResult('chat-result', r.status, await r.json(), true);
+  } catch(e) {
+    showResult('chat-result', 0, {error: e.message}, false);
+  }
+  setLoading(btn, false);
+}
+
+// Enter key sends chat
+document.getElementById('chat-ask').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.querySelector('#chat .run-btn').click();
+});
+
+// Sidebar active state on scroll
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      const a = document.querySelector(`.nav-item[href="#${e.target.id}"]`);
+      if (a) a.classList.add('active');
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('[id]').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
