@@ -6,7 +6,7 @@ import { ConversationMetadata, RPCPayload, StreamResponse } from './models.js';
 import { ProfileManager } from './profiles.js';
 import { RPCTransport } from './rpc.js';
 import { CookieJar } from '../util/cookieJar.js';
-import { logger } from '../../../@exocore/multi/dist/index.js';
+import { logger } from "@exocore/multi";
 import { COOKIES_JSON_PATH, LOCAL_COOKIES_PATH, discoverCookiesPath, importCookiesToProfile } from './cookieManager.js';
 import * as fs from 'fs';
 import { uploadToContentPush, buildFileDataItem } from './upload.js';
