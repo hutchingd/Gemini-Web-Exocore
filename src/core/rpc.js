@@ -5,7 +5,7 @@ import {
 } from './constants.js';
 import { BatchResult, Candidate, ConversationMetadata, RPCPayload, StreamResponse } from './models.js';
 import { parseBatchexecuteResponse, parseStreamResponse } from './parser.js';
-import { logger } from '../../../@exocore/multi/dist/index.js';
+import { logger } from "@exocore/multi";
 
 export function buildBatchexecuteBody(payloads, accessToken) {
   const serialized = [payloads.map(p => p.serialize())];
