@@ -1,4 +1,4 @@
-import { logger } from '../../../@exocore/multi/dist/index.js';
+import { logger } from "@exocore/multi"
 
 const LENGTH_MARKER_RE = /^(\d+)\n/;
 
